@@ -63,8 +63,8 @@ const isNewBlockValid = (candidateBlock, latestBlock) => {
   if(!isNewStructureValid(candidateBlock)) {
     console.log('The candidateBlock structure is not valid');
     return false;
-  } else if (latestBlock.index + 1 === candidateBlock.index) {
-    console.log('The candidate block does not have a valid index');
+  } else if (latestBlock.index + 1 !== candidateBlock.index) {
+    console.log('The candidateblock does not have a valid index');
     return false;
   } else if (latestBlock.hash !== candidateBlock.previousHash) {
     console.log('The prevousHash of candidateBlock is not the hash of the latest block');
@@ -116,7 +116,7 @@ const replaceChain = candidateChain => {
 
 const addBlockToChain = candidateBlock => {
   if (isNewBlockValid(candidateBlock, getLastBlock())) {
-    getBlockchain().push(candidateBlock);
+    blockchain.push(candidateBlock);
     return true;
   } else {
     return false;
