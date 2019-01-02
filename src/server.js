@@ -1,9 +1,11 @@
 const express = require('express'),
   bodyParser = require('body-parser'),
   morgan = require('morgan'),
-  Blockchain = require('./blockchain');
+  Blockchain = require('./blockchain'),
+  P2P = require('./p2p');
 
 const { getBlockchain, createNewBlock } = Blockchain;
+const { StartP2PServer } = P2P;
 
 const PORT = process.env.HTTP_PORT || 3000;
 
@@ -21,4 +23,8 @@ app.post('/blocks', (req, res) => {
   res.send(newBlock);
 });
 
-app.listen(PORT, () => console.log(`Bitcoin_clone Server running on ${PORT} ✅`));
+const server = app.listen(PORT, () => 
+  console.log(`Bitcoin Clone HTTP Server running on port ${PORT} ✅`)
+);
+
+StartP2PServer(server);
