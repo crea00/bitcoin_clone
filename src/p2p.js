@@ -1,4 +1,35 @@
-const WebSockets = require('ws');
+const WebSockets = require('ws'),
+  Blockchain = require('./blockchain');
+
+const { getLastBlock } = Blockchain;
+
+// Messages Types
+const GET_LATEST = 'GET_LATEST';
+const GET_ALL = 'GET_ALL';
+const BLOCKCHAIN_RESPONSE = 'BLOCKCHAIN_RESPONSE';
+
+// Message Creators
+const getLatest = () => {
+  return {
+    type: GET_LATEST,
+    data: null
+  };
+};
+
+const getAll = () => {
+  return {
+    type: GET_ALL,
+    data: null
+  };
+};
+
+const blockchainResponse = data => {
+  return {
+    type: BLOCKCHAIN_RESPONSE,
+    data
+  };
+};
+
 
 const sockets = [];
 
@@ -12,14 +43,16 @@ const startP2PServer = server => {
   console.log('Bitcoin Clone P2P Server running!');
 };
 
-const initSocketConnection = socket => {
-  sockets.push(socket); 
-  handleSocketError(socket);
-  socket.on('message', (data) => {
-    console.log(data);
+const initSocketConnection = ws => {
+  sockets.push(ws);
+  handleSocketMessages(ws);
+  handleSocketError(ws);
+};
+
+const handleSocketMessages = ws =>{
+  ws.on('message', data => {
+
   });
-  setTimeout(() => { socket.send('welcome');
-  }, 5000);
 };
 
 const handleSocketError = ws => {
