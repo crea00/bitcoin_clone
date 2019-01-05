@@ -20,7 +20,7 @@ const genesisBlock = new Block(
   0,
   '5A193CC5D9197585F4EEF9E2B8064E58AB3345372BDD5BE36E48CB9249D4333A',
   null,
-  1546337562415,
+  1546690715,
   'This is the genesis!!',
   0,
   0
@@ -30,7 +30,7 @@ let blockchain = [genesisBlock];
 
 const getNewestBlock = () => blockchain[blockchain.length - 1];
 
-const getTimestamp = () => new Date().getTime() / 1000;
+const getTimestamp = () => Math.round(new Date().getTime() / 1000);
 
 const getBlockchain = () => blockchain;
 
@@ -51,7 +51,7 @@ const createNewBlock = data => {
     data,
     difficulty
   );
-  
+
   addBlockToChain(newBlock);
   require('./p2p').broadcastNewBlock();
   return newBlock;
@@ -126,6 +126,13 @@ const getBlocksHash = (block) => createHash(
   block.nonce
 );
 
+const isTimeStampValid = (newblock, oldBlock) => {
+  return (
+    oldBlock.timestamp - 60 < newblock.timestamp &&
+    newblock.timestamp -60 < getTimestamp()
+  );
+};
+
 const isBlockValid = (candidateBlock, latestBlock) => {
   if(!isBlockStructureValid(candidateBlock)) {
     console.log('The candidateBlock structure is not valid');
@@ -139,7 +146,10 @@ const isBlockValid = (candidateBlock, latestBlock) => {
   } else if (getBlocksHash(candidateBlock) !== candidateBlock.hash) {
     console.log('The hash of this block is invalid');
     return false;
-  } 
+  } else if (!isTimeStampValid(candidateBlock, latestBlock)) {
+    console.log('The timestamp of this block is dodgy');
+    return false;
+  }
   return true;
 };
 
