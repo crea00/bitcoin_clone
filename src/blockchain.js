@@ -1,6 +1,9 @@
 const CryptoJS = require('crypto-js'),
   hexToBinary = require('hex-to-binary');
 
+const BLOCK_GENERATION_INTERVAL = 10;
+const DIFFICULTY_ADJUSTMENT_INTERVAL = 10;
+
 class Block {
   constructor(index, hash, previousHash, timestamp, data, difficulty, nonce) {
     this.index = index;
@@ -40,16 +43,29 @@ const createNewBlock = data => {
   const previousBlock = getNewestBlock();
   const newBlockIndex = previousBlock.index + 1;
   const newTimestamp = getTimestamp();
+  const difficulty = findDifficulty();
   const newBlock = findBlock(
     newBlockIndex,
     previousBlock.hash,
     newTimestamp,
     data,
-    20
+    difficulty
   );
   addBlockToChain(newBlock);
   require('./p2p').broadcastNewBlock();
   return newBlock;
+};
+
+const findDifficulty = () => {
+  const newestBlock = getNewestBlock();
+  if (
+    newestBlock.index % DIFFICULTY_ADJUSTMENT_INTERVAL === 0 &&
+    newestBlock.index !== 0
+  ) {
+    // calculate new difficulty
+  } else {
+    return newestBlock.difficulty;
+  }
 };
 
 const findBlock = (index, previousHash, timestamp, data, difficulty) => {
@@ -90,7 +106,9 @@ const getBlocksHash = (block) => createHash(
   block.index,
   block.previousHash,
   block.timestamp,
-  block.data
+  block.data,
+  block.difficulty,
+  block.nonce
 );
 
 const isBlockValid = (candidateBlock, latestBlock) => {
