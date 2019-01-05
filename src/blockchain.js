@@ -51,9 +51,24 @@ const createNewBlock = data => {
     data,
     difficulty
   );
+  
   addBlockToChain(newBlock);
   require('./p2p').broadcastNewBlock();
   return newBlock;
+};
+
+const calculateNewDifficulty = (newestBlock, blockchain) => {
+  const lastCalculatedBlock = blockchain[blockchain.length - DIFFICULTY_ADJUSTMENT_INTERVAL];
+  const timeExpected = BLOCK_GENERATION_INTERVAL * DIFFICULTY_ADJUSTMENT_INTERVAL;
+  const timeTaken = newestBlock.timestamp - lastCalculatedBlock.timestamp;
+
+  if (timeTaken < (timeExpected / 2)) {
+    return lastCalculatedBlock.difficulty + 1;
+  } else if (timeTaken > (timeExpected * 2)) {
+    return lastCalculatedBlock.difficulty - 1;
+  } else {
+    return lastCalculatedBlock.difficulty;
+  }
 };
 
 const findDifficulty = () => {
@@ -62,7 +77,7 @@ const findDifficulty = () => {
     newestBlock.index % DIFFICULTY_ADJUSTMENT_INTERVAL === 0 &&
     newestBlock.index !== 0
   ) {
-    // calculate new difficulty
+    return calculateNewDifficulty(newestBlock, getBlockchain());
   } else {
     return newestBlock.difficulty;
   }
