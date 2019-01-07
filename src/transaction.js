@@ -23,9 +23,9 @@ class Transaction {
 }
 
 class UTxOut {
-  constructor(uTxOutId, uTxOutIndex, address, amount) {
-    this.uTxOutId = uTxOutId;
-    this.uTxOutIndex = uTxOutIndex;
+  constructor(txOutId, txOutIndex, address, amount) {
+    this.txOutId = txOutId;
+    this.txOutIndex = txOutIndex;
     this.address = address;
     this.amount = amount;
   }
@@ -35,7 +35,7 @@ let uTxOuts = [];
 
 const getTxId = tx => {
   const txInContent = tx.txIns
-    .map(txIn => txIn.uTxOutId + txIn.uTxOutIndex)
+    .map(txIn => txIn.uTxOutId + txIn.txOutIndex)
     .reduce((a, b) => a + b, '');
 
   const txOutContent = tx.txOuts
@@ -45,12 +45,20 @@ const getTxId = tx => {
   return CryptoJS.SHA256(txInContent + txOutContent).toString();
 };
 
+const findUTxOut = (txOutId, txOutIndex, uTxOutList) => {
+  return uTxOutList.find(
+    uTxOut => uTxOut.txOutId === txOutId && uTxOut.txOutIndex === txOutIndex
+  );
+};
+
 const signTxIn = (tx, txInIndex, privateKey, uTxOut) => {
   const txIn = tx.txIns[txInIndex];
   const dataToSign = tx.id;
-  // TO DO: Find Tx
-  const referencedUTxOut = null;
+
+  const referencedUTxOut = findUTxOut(txIn.txOutId, txIn.txOutId, uTxOuts);
   if (referencedUTxOut === null) {
     return;
   }
+
+  // TO DO: Sign the txIn
 };
