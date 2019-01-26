@@ -56,11 +56,20 @@ const signTxIn = (tx, txInIndex, privateKey, uTxOut) => {
   const txIn = tx.txIns[txInIndex];
   const dataToSign = tx.id;
 
-  const referencedUTxOut = findUTxOut(txIn.txOutId, txIn.txOutId, uTxOuts);
+  const referencedUTxOut = findUTxOut(txIn.txOutId, tx.txOutIndex, uTxOuts);
   if (referencedUTxOut === null) {
     return;
   }
   const key = ec.keyFromPrivate(privateKey, 'hex');
   const signature = utils.toHexString(key.sign(dataToSign).toDER());
   return signature;
+};
+
+const updateUTxOuts = (newTxs, uTxOutList) => {
+  const newUTxOuts = newTxs.map(tx => {
+    tx.txOuts.map((txOut, index) => {
+      new UTxOut(tx.id, index, txOut.address, txOut.amount);
+    });
+  })
+  .reduce((a, b) => a.concat(b), []);
 };
