@@ -1,5 +1,6 @@
 const CryptoJS = require('crypto-js'),
-  EC = require('elliptic').ec;
+  EC = require('elliptic').ec,
+  utils = require('./utils');
 
 const ec = new EC('secp256k1');
 
@@ -59,6 +60,7 @@ const signTxIn = (tx, txInIndex, privateKey, uTxOut) => {
   if (referencedUTxOut === null) {
     return;
   }
-
-  // TO DO: Sign the txIn
+  const key = ec.keyFromPrivate(privateKey, 'hex');
+  const signature = utils.toHexString(key.sign(dataToSign).toDER());
+  return signature;
 };
