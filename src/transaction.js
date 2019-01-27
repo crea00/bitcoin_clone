@@ -72,4 +72,9 @@ const updateUTxOuts = (newTxs, uTxOutList) => {
     });
   })
   .reduce((a, b) => a.concat(b), []);
+
+  const spentTxOuts = newTxs
+    .map(tx => tx.txIns)
+    .reduce((a, b) => a.concat(b), [])
+    .map(txIn => new UTxOut(txIn.txOutId, txIn.txOutIndex, '', 0));
 };
