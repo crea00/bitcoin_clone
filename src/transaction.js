@@ -4,6 +4,8 @@ const CryptoJS = require('crypto-js'),
 
 const ec = new EC('secp256k1');
 
+const COINBASE_AMOUNT = 50;
+
 class TxOut {
   constructor(address, amount) {
     this.address = address;
@@ -168,6 +170,10 @@ const getAmountInTxIn = (txIn, uTxOutList) =>
   findUTxOut(txIn.txOutId, txIn.txOutIndex, uTxOutList).amount;
 
 const validateTx = (tx, uTxOutList) => {
+  if(!isTxStructureValid) {
+    return false;
+  }
+
   if(getTxId(tx) !== tx.id) {
     return false;
   }
@@ -189,6 +195,24 @@ const validateTx = (tx, uTxOutList) => {
     .reduce((a, b) => a + b, 0);
 
   if(amountInTxIns !== amountInTxOuts) {
+    return false;
+  } else {
+    return true;
+  }
+};
+
+const validateCoinbaseTx = (tx, blockIndex) => {
+  if(getTxId(tx) !== tx.id) {
+    return false;
+    // It comes from one blockchain
+  } else if(tx.txIns.length !== 1) {
+    return false;
+  } else if(tx.txIns[0].txOutIndex !== blockIndex) {
+    return false;
+    // b/c miner is only one person
+  } else if(tx.txOuts.length !== 1) {
+    return false;
+  } else if(tx.txOuts[0].amount !== COINBASE_AMOUNT) {
     return false;
   } else {
     return true;
