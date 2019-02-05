@@ -2,10 +2,12 @@ const express = require('express'),
   bodyParser = require('body-parser'),
   morgan = require('morgan'),
   Blockchain = require('./blockchain'),
-  P2P = require('./p2p');
+  P2P = require('./p2p'),
+  wallet = require('./wallet');
 
 const { getBlockchain, createNewBlock } = Blockchain;
 const { startP2PServer, connectToPeers } = P2P;
+const { initWallet } = wallet;
 
 const PORT = process.env.HTTP_PORT || 3000;
 
@@ -33,4 +35,5 @@ const server = app.listen(PORT, () =>
   console.log(`Bitcoin Clone HTTP Server running on port ${PORT} ✅`)
 );
 
+initWallet();
 startP2PServer(server);
