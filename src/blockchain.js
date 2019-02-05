@@ -155,11 +155,11 @@ const isBlockValid = (candidateBlock, latestBlock) => {
 
 const isBlockStructureValid = (block) => {
   return (
-    typeof block.index === 'number'
-    && typeof block.hash === 'string'
-    && typeof block.previousHash === 'string'
-    && typeof block.timestamp === 'number'
-    && typeof block.data === 'string'
+    typeof block.index === 'number' &&
+    typeof block.hash === 'string' &&
+    typeof block.previousHash === 'string' &&
+    typeof block.timestamp === 'number' &&
+    typeof block.data === 'string'
   );
 };
 
