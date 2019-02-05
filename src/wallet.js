@@ -13,6 +13,18 @@ const generatePrivateKey = () => {
   return privateKey.toString(16);
 };
 
+const getPrivateFromWallet = () => {
+  const buffer = fs.readFileSync(privateKeyLocation, 'utf-8');
+  buffer.toString();
+};
+
+const getPublicFromWallet = () => {
+  const privateKey = getPrivateFromWallet();
+  const key = ec.keyFromPrivate(privateKey, 'hex');
+
+  return key.getPublic().encode('hex');
+};
+
 const initWallet = () => {
   if(fs.existsSync(privateKeyLocation)) {
     return;
@@ -24,4 +36,4 @@ const initWallet = () => {
 
 module.exports = {
   initWallet
-}
+};
