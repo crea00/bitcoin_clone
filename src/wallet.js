@@ -1,7 +1,10 @@
 const EC = require('elliptic').ec,
   path = require('path'),
   fs = require('fs'),
-  _ = require('lodash');
+  _ = require('lodash'),
+  Transactions = require('./transactions');
+
+const { getPublicKey, getTxId, signTxIn } = Transactions;
 
 const ec = new EC('secp256k1');
 
@@ -40,6 +43,15 @@ const initWallet = () => {
   const newPrivateKey = generatePrivateKey();
 
   fs.writeFileSync(privateKeyLocation, newPrivateKey);
+};
+
+const findAmountInUtxOuts = (amountNeeded, myUtxOuts) => {
+  
+};
+
+const createTx = (receiverAddress, amount, privateKey, uTxOutList) => {
+  const myAddress = getPublicKey(privateKey);
+  const myUTxOuts = uTxOutList.filter(uTxO => uTxO.address === myAddress)
 };
 
 module.exports = {
