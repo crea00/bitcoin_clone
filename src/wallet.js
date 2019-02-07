@@ -4,7 +4,7 @@ const EC = require('elliptic').ec,
   _ = require('lodash'),
   Transactions = require('./transactions');
 
-const { getPublicKey, getTxId, signTxIn } = Transactions;
+const { getPublicKey, getTxId, signTxIn, TxIn } = Transactions;
 
 const ec = new EC('secp256k1');
 
@@ -67,6 +67,19 @@ const createTx = (receiverAddress, amount, privateKey, uTxOutList) => {
   const myUTxOuts = uTxOutList.filter(uTxO => uTxO.address === myAddress);
 
   const { includedUTxOuts, leftOverAmount } = findAmountInUtxOuts(amount, myUTxOuts);
+
+  const toUnsignedTxIn = uTxOut => {
+    const txIn = new TxIn();
+    txIn.txOutId = uTxOut.txOutId;
+    txIn.txOutIndex = uTxOut.txOutIndex;
+  };
+
+  const unsignedTxIns = includedUTxOuts.map(toUnsignedTxIn);
+
+  const tx = new Transactions();
+
+  tx.txIns = unsignedTxIns;
+  tx.txOuts;
 };
 
 module.exports = {

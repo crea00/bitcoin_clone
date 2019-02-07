@@ -14,8 +14,8 @@ class TxOut {
 }
 
 class TxIn {
-  // uTxOutId
-  // uTxOutIndex
+  // txOutId
+  // txOutIndex
   // Signature
 }
 
@@ -257,4 +257,5 @@ module.exports = {
   getPublicKey,
   getTxId,
   signTxIn,
+  TxIn,
 };
