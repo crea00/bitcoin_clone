@@ -54,10 +54,10 @@ const findUTxOut = (txOutId, txOutIndex, uTxOutList) => {
   );
 };
 
-const signTxIn = (tx, txInIndex, privateKey, uTxOut) => {
+const signTxIn = (tx, txInIndex, privateKey, uTxOutList) => {
   const txIn = tx.txIns[txInIndex];
   const dataToSign = tx.id;
-  const referencedUTxOut = findUTxOut(txIn.txOutId, tx.txOutIndex, uTxOuts);
+  const referencedUTxOut = findUTxOut(txIn.txOutId, tx.txOutIndex, uTxOutList);
 
   if (referencedUTxOut === null) {
     console.log('Could not find the referenced uTxOut, not signing');
@@ -258,4 +258,5 @@ module.exports = {
   getTxId,
   signTxIn,
   TxIn,
+  TxOut,
 };
