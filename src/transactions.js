@@ -256,8 +256,8 @@ const createCoinbaseTx = (address, blockIndex) => {
   const txIn = new TxIn();
   txIn.signature = '';
   txIn.txOutId = blockIndex;
-  tx.txIns[txIn];
-  tx.txOut = [new TxOut(address, COINBASE_AMOUNT)];
+  tx.txIns = [txIn];
+  tx.txOuts = [new TxOut(address, COINBASE_AMOUNT)];
   tx.id = getTxId(tx);
   return tx;
 };
