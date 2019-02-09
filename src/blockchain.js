@@ -1,5 +1,10 @@
 const CryptoJS = require('crypto-js'),
-  hexToBinary = require('hex-to-binary');
+  hexToBinary = require('hex-to-binary'),
+  Wallet = require('./wallet'),
+  Transactions = require('./transactions');
+
+const { getBalance, getPublicFromWallet } = Wallet;
+const { createCoinbaseTx, processTxs } = Transactions;
 
 const BLOCK_GENERATION_INTERVAL = 10;
 const DIFFICULTY_ADJUSTMENT_INTERVAL = 10;
@@ -28,6 +33,8 @@ const genesisBlock = new Block(
 
 let blockchain = [genesisBlock];
 
+let uTxOuts = [];
+
 const getNewestBlock = () => blockchain[blockchain.length - 1];
 
 const getTimestamp = () => Math.round(new Date().getTime() / 1000);
@@ -39,7 +46,16 @@ const createHash = (index, previousHash, timestamp, data, difficulty, nonce) =>
     index + previousHash + timestamp + JSON.stringify(data) + difficulty + nonce
   ).toString();
 
-const createNewBlock = data => {
+const createNewBlock = () => {
+  const coinbaseTx = createCoinbaseTx(
+    getPublicFromWallet(),
+    getNewestBlock().index + 1
+  );
+  const blockData = [coinbaseTx];
+  return createNewRawBlock(blockData);
+};
+
+const createNewRawBlock = data => {
   const previousBlock = getNewestBlock();
   const newBlockIndex = previousBlock.index + 1;
   const newTimestamp = getTimestamp();
@@ -153,13 +169,13 @@ const isBlockValid = (candidateBlock, latestBlock) => {
   return true;
 };
 
-const isBlockStructureValid = (block) => {
+const isBlockStructureValid = block => {
   return (
     typeof block.index === 'number' &&
     typeof block.hash === 'string' &&
     typeof block.previousHash === 'string' &&
     typeof block.timestamp === 'number' &&
-    typeof block.data === 'string'
+    typeof block.data === 'object'
   );
 };
 
@@ -199,12 +215,27 @@ const replaceChain = candidateChain => {
 
 const addBlockToChain = candidateBlock => {
   if (isBlockValid(candidateBlock, getNewestBlock())) {
-    blockchain.push(candidateBlock);
+    const processedTxs = processTxs(
+      candidateBlock.data,
+      uTxOuts,
+      candidateBlock.index
+    );
+    if(processedTxs === null) {
+      console.log('Could not porcess txs');
+      return false;
+    } else {
+      blockchain.push(candidateBlock);
+      uTxOuts = processedTxs;
+      return true;
+    }
     return true;
   } else {
     return false;
   }
 };
+
+const getAccountBalance = () => 
+  getBalance(getPublicFromWallet(), uTxOuts)
 
 module.exports = {
   addBlockToChain,
@@ -213,4 +244,5 @@ module.exports = {
   getNewestBlock,
   isBlockStructureValid,
   replaceChain,
+  getAccountBalance,
 };
